@@ -107,26 +107,22 @@ export function useSession() {
       setPhase('processing');
       setErrorMessage('');
 
-      const useGroq = isGroqConfigured();
-      const stage2Label = useGroq
-        ? 'Groq AI: Dividing Anchor & Participant speech'
-        : 'Analyzing feedback';
-      const stage3Label = useGroq
-        ? 'Groq AI: Analyzing participant sentiment & insights'
-        : 'Creating structured insight';
+      const stage2Label = 'Model is analyzing conversation...';
+      const stage3Label = 'Structuring speaker dialogue & sentiments...';
 
       const stages: ProcessingStage[] = [
         { label: 'Feedback text captured', status: 'complete' },
         { label: 'Transcript prepared', status: 'complete' },
         { label: stage2Label, status: 'active' },
         { label: stage3Label, status: 'pending' },
-        { label: 'Saving to Firebase', status: 'pending' },
+        { label: 'Saving record...', status: 'pending' },
       ];
       setProcessingStages([...stages]);
 
       try {
         const groq = groqEngineRef.current ?? new GroqEngine();
         const slm = slmEngineRef.current ?? new FeedbackSLMEngine();
+        const useGroq = isGroqConfigured();
 
         let result: StructuredFeedback | null = null;
         if (useGroq) {
@@ -153,14 +149,14 @@ export function useSession() {
               }
             );
           } catch (groqErr) {
-            console.warn('Groq AI failed, activating on-device SLM backup engine:', groqErr);
+            console.warn('Primary model failed, activating on-device backup engine:', groqErr);
             result = null;
           }
         }
 
-        // On Groq failure or if not configured, use local SLM engine backup so submission never fails
+        // On primary failure or if not configured, use local engine backup so submission never fails
         if (!result) {
-          stages[2] = { label: 'Analyzing feedback (SLM backup)', status: 'active' };
+          stages[2] = { label: stage2Label, status: 'active' };
           setProcessingStages([...stages]);
 
           const slmResult = await slm.analyze(
@@ -172,14 +168,14 @@ export function useSession() {
             },
             (progress) => {
               if (progress.stage === 'analyzing') {
-                stages[2] = { label: 'Analyzing feedback (SLM backup)', status: 'active' };
+                stages[2] = { label: stage2Label, status: 'active' };
                 setProcessingStages([...stages]);
               } else if (progress.stage === 'structuring') {
-                stages[2] = { label: 'Analyzing feedback (SLM backup)', status: 'complete' };
-                stages[3] = { label: 'Creating structured insight', status: 'active' };
+                stages[2] = { label: stage2Label, status: 'complete' };
+                stages[3] = { label: stage3Label, status: 'active' };
                 setProcessingStages([...stages]);
               } else if (progress.stage === 'complete') {
-                stages[3] = { label: 'Creating structured insight', status: 'complete' };
+                stages[3] = { label: stage3Label, status: 'complete' };
                 setProcessingStages([...stages]);
               }
             }
@@ -284,26 +280,22 @@ export function useSession() {
     setPhase('processing');
     setErrorMessage('');
 
-    const useGroq = isGroqConfigured();
-    const stage2Label = useGroq
-      ? 'Groq AI: Dividing Anchor & Participant speech'
-      : 'Analyzing feedback';
-    const stage3Label = useGroq
-      ? 'Groq AI: Analyzing participant sentiment & insights'
-      : 'Creating structured insight';
+    const stage2Label = 'Model is analyzing conversation...';
+    const stage3Label = 'Structuring speaker dialogue & sentiments...';
 
     const stages: ProcessingStage[] = [
       { label: 'Speech captured', status: 'complete' },
       { label: 'Transcript prepared', status: 'complete' },
       { label: stage2Label, status: 'active' },
       { label: stage3Label, status: 'pending' },
-      { label: 'Saving to Firebase', status: 'pending' },
+      { label: 'Saving record...', status: 'pending' },
     ];
     setProcessingStages([...stages]);
 
     try {
       const groq = groqEngineRef.current ?? new GroqEngine();
       const slm = slmEngineRef.current ?? new FeedbackSLMEngine();
+      const useGroq = isGroqConfigured();
 
       let result: StructuredFeedback | null = null;
       if (useGroq) {
@@ -330,14 +322,14 @@ export function useSession() {
             }
           );
         } catch (groqErr) {
-          console.warn('Groq AI failed, activating on-device SLM backup engine:', groqErr);
+          console.warn('Primary model failed, activating on-device backup engine:', groqErr);
           result = null;
         }
       }
 
-      // On Groq failure or if not configured, use local SLM engine backup so submission never fails
+      // On primary failure or if not configured, use local engine backup so submission never fails
       if (!result) {
-        stages[2] = { label: 'Analyzing feedback (SLM backup)', status: 'active' };
+        stages[2] = { label: stage2Label, status: 'active' };
         setProcessingStages([...stages]);
 
         const slmResult = await slm.analyze(
@@ -349,14 +341,14 @@ export function useSession() {
           },
           (progress) => {
             if (progress.stage === 'analyzing') {
-              stages[2] = { label: 'Analyzing feedback (SLM backup)', status: 'active' };
+              stages[2] = { label: stage2Label, status: 'active' };
               setProcessingStages([...stages]);
             } else if (progress.stage === 'structuring') {
-              stages[2] = { label: 'Analyzing feedback (SLM backup)', status: 'complete' };
-              stages[3] = { label: 'Creating structured insight', status: 'active' };
+              stages[2] = { label: stage2Label, status: 'complete' };
+              stages[3] = { label: stage3Label, status: 'active' };
               setProcessingStages([...stages]);
             } else if (progress.stage === 'complete') {
-              stages[3] = { label: 'Creating structured insight', status: 'complete' };
+              stages[3] = { label: stage3Label, status: 'complete' };
               setProcessingStages([...stages]);
             }
           }
@@ -403,7 +395,7 @@ export function useSession() {
       { label: 'Transcript prepared', status: 'complete' },
       { label: 'Analyzing feedback', status: 'complete' },
       { label: 'Creating structured insight', status: 'complete' },
-      { label: 'Saving to Firebase', status: 'active' },
+      { label: 'Saving record...', status: 'active' },
     ];
     setProcessingStages([...stages]);
     setPhase('processing');
@@ -414,17 +406,17 @@ export function useSession() {
 
       if (result.success) {
         setSubmitResult(result);
-        stages[4] = { label: 'Saving to Firebase', status: 'complete' };
+        stages[4] = { label: 'Saving record...', status: 'complete' };
         setProcessingStages([...stages]);
         setPhase('success');
         setIsProcessing(false);
       } else {
-        setErrorMessage(result.error || 'Firebase submission failed.');
+        setErrorMessage(result.error || 'Submission failed.');
         setPhase('error');
         setIsProcessing(false);
       }
     } catch (err) {
-      const msg = err instanceof Error ? err.message : 'Firebase submission failed.';
+      const msg = err instanceof Error ? err.message : 'Submission failed.';
       setErrorMessage(msg);
       setPhase('error');
       setIsProcessing(false);

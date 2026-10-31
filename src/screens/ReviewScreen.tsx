@@ -61,12 +61,12 @@ export function ReviewScreen({ feedback, onUpdate, onSubmit, onBack }: ReviewScr
           />
         </div>
 
-        {/* Speaker Separation Section (Groq AI) */}
+        {/* Speaker Separation Section */}
         {(feedback.anchorSpeech || feedback.participantSpeech || (feedback.dialogue && feedback.dialogue.length > 0)) && (
           <div className="bg-white rounded-2xl p-5 shadow-sm border border-[#E8E8EA] space-y-4">
             <div className="flex items-center justify-between">
               <h2 className="text-xs font-bold text-[#1A1A1C] uppercase tracking-wider flex items-center gap-1.5">
-                ⚡ Speaker Separation (Groq AI)
+                ⚡ Speaker Separation
               </h2>
               {feedback.participantSentiment && (
                 <span className="text-[10px] font-bold px-2 py-0.5 rounded-full capitalize bg-[#FEF2F2] text-[#D52B1E] border border-[#F8C5C5]">
@@ -283,7 +283,7 @@ export function ReviewScreen({ feedback, onUpdate, onSubmit, onBack }: ReviewScr
             }}
           >
             <CloudIcon size={20} color="#FFFFFF" />
-            <span>Save Record to Firebase</span>
+            <span>Save Feedback Record</span>
           </button>
         </div>
       </div>

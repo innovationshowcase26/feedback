@@ -1,8 +1,7 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { AlertIcon, RefreshIcon, ArrowLeftIcon } from '../components/icons';
 import { InnovationBackground, GoldDivider } from '../components/InnovationBackground';
 import { WFTheme } from '../theme';
-import { getGroqApiKey, setGroqApiKey } from '../engines/GroqEngine';
 
 interface ErrorScreenProps {
   errorMessage: string;
@@ -12,9 +11,6 @@ interface ErrorScreenProps {
 }
 
 export function ErrorScreen({ errorMessage, onRetry, onBack, onCancel }: ErrorScreenProps) {
-  const [apiKeyInput, setApiKeyInput] = useState(getGroqApiKey());
-  const [saved, setSaved] = useState(false);
-  const isGroqRelated = errorMessage.toLowerCase().includes('groq');
   return (
     <div className="min-h-screen bg-[#FAF9F7] text-[#1A1A1C] relative flex flex-col justify-center items-center px-6 py-12">
       <InnovationBackground variant="light" />
@@ -43,39 +39,6 @@ export function ErrorScreen({ errorMessage, onRetry, onBack, onCancel }: ErrorSc
           <p className="text-xs text-[#4A4A50] leading-relaxed break-words">
             {errorMessage || 'An unexpected error occurred during submission.'}
           </p>
-
-          {isGroqRelated && (
-            <div className="mt-4 pt-3 border-t border-[#E8E8EA] space-y-2">
-              <label className="block text-[10px] font-bold text-[#D52B1E] uppercase tracking-wider">
-                Enter / Update Groq API Key
-              </label>
-              <div className="flex gap-2">
-                <input
-                  type="password"
-                  value={apiKeyInput}
-                  onChange={(e) => setApiKeyInput(e.target.value)}
-                  placeholder="gsk_..."
-                  className="flex-1 px-3 py-2 bg-[#FAF9F7] rounded-xl border border-[#E8E8EA] text-xs font-mono text-[#1A1A1C] focus:outline-none focus:border-[#D52B1E]"
-                />
-                <button
-                  type="button"
-                  onClick={() => {
-                    setGroqApiKey(apiKeyInput);
-                    setSaved(true);
-                    setTimeout(() => setSaved(false), 2000);
-                  }}
-                  className="px-3.5 py-2 bg-[#1A1A1C] hover:bg-black text-white text-xs font-bold rounded-xl transition-all"
-                >
-                  Save
-                </button>
-              </div>
-              {saved && (
-                <p className="text-[11px] text-[#10B981] font-semibold">
-                  ✓ Groq Key saved! Now click "Retry Submission".
-                </p>
-              )}
-            </div>
-          )}
         </div>
 
         {/* Action buttons */}
